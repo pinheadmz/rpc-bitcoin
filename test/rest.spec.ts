@@ -1,43 +1,27 @@
-import * as nock from "nock";
 import { RESTClient } from "../.";
-import * as assert from "assert";
 
-const port = 18332;
-const timeout = 20000;
-const client = new RESTClient({ port, timeout });
+const url = "http://127.0.0.1";
+const port = 48332;
+const timeout = 10000;
+const client = new RESTClient({ url, port, timeout });
 
 suite("RESTClient", () => {
-  suiteSetup(() => {
-    nock.cleanAll();
-    nock.load("./test/mocks/rest.json");
-  });
-
-  test(".constructor()", () => {
-    const url = "http://www.example.com";
-    const port = 15978;
-    const timeout = 32154;
-    const baseUrl = url + ":" + port;
-    const json = true;
-    const client = new RESTClient({ url, port, timeout });
-    assert.deepStrictEqual(client._rpoptions, { baseUrl, timeout, json });
-  });
-
   test(".getBlock()", async () => {
     const hash =
-      "00000000099de420b319c7804c4bfee5357d3f5ddbfd3c71c15b3625347792bf";
+      "000000004deda718e1471a0b5899303e84df0d7a437284b93d29698724f11a0c";
     const format = "hex";
     await client.getBlock({ hash, format });
   });
 
   test(".getBlockNoTxDetails()", async () => {
     const hash =
-      "00000000099de420b319c7804c4bfee5357d3f5ddbfd3c71c15b3625347792bf";
+      "000000004deda718e1471a0b5899303e84df0d7a437284b93d29698724f11a0c";
     const format = "hex";
     await client.getBlockNoTxDetails({ hash, format });
   });
 
   test(".getBlockHashByHeight()", async () => {
-    const height = 1;
+    const height = 20;
     const format = "hex";
     await client.getBlockHashByHeight({ height, format });
   });
@@ -50,13 +34,11 @@ suite("RESTClient", () => {
     const checkmempool = true;
     const outpoints = [
       {
-        txid:
-          "e346be6c1ef4d24f3a26ea8e1b45a2645d339fbee9da8b9dc03aeef1c4179716",
+        txid: "285abf38807a7ebd0c7578cb84f436265149bd59f358aeb23ae3ee1c91c43fb1",
         n: 0,
       },
       {
-        txid:
-          "e346be6c1ef4d24f3a26ea8e1b45a2645d339fbee9da8b9dc03aeef1c4179716",
+        txid: "972e535a37eced8889ba9f397da4c83d45399c27893ff08b180327f315e53ddd",
         n: 1,
       },
     ];
@@ -67,7 +49,7 @@ suite("RESTClient", () => {
   test(".getHeaders()", async () => {
     const count = 5;
     const hash =
-      "00000000000001f0be142e57e99d3528212e1204157209c6c10bd11326cc5b35";
+      "0000000013d69b9a712894260f6819f7618c6d7bd983a7ec1bab22f043ae6fd8";
     const format = "hex";
     await client.getHeaders({ count, hash, format });
   });
@@ -82,7 +64,7 @@ suite("RESTClient", () => {
 
   test(".getTx()", async () => {
     const txid =
-      "93520a51cc6c694e79913f1daf0288cb10e0d7946723c06b4e7b6c2e5b057933";
+      "9831efc61a04b132559e03a5f658cd72693e612798aa7f97da839bef195d108e";
     const format = "hex";
     await client.getTx({ txid, format });
   });

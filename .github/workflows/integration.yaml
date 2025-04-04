@@ -1,0 +1,30 @@
+name: integration
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build node package
+        run: npm install && npm run build
+      - name: Build bitcoin
+        run: |
+          sudo apt-get install -y build-essential cmake pkgconf python3 libevent-dev libboost-dev libzmq3-dev
+          git clone --depth 1 --branch http-rewrite-13march2025 https://github.com/pinheadmz/bitcoin
+          cd bitcoin
+          cmake -B build -DENABLE_WALLET=OFF -DWITH_ZMQ=ON -DBUILD_GUI=OFF -DBUILD_BENCH=OFF -DBUILD_FUZZ_BINARY=OFF -DBUILD_GUI_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_UTIL=OFF -DBUILD_TX=OFF -DBUILD_WALLET_TOOL=OFF
+          cmake --build build
+          build/bin/bitcoind -testnet4 -rest=1 -txindex=1 -debug=rpc -debug=http -rpcuser=u -rpcpassword=p -blockfilterindex=1 -daemon
+          build/bin/bitcoin-cli -testnet4 -rpcuser=u -rpcpassword=p  -rpcwait waitforblockheight 100 100000
+          # stop sync at height 100
+          build/bin/bitcoin-cli -testnet4 -rpcuser=u -rpcpassword=p invalidateblock 00000000aa39493ac9c0e2836438a68daf699946b31fee944d97e6191e4ee6bb
+      - name: Test
+        run: npm run test

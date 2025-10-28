@@ -17,8 +17,8 @@ jobs:
         run: npm install && npm run build
       - name: Build bitcoin
         run: |
-          sudo apt-get install -y build-essential cmake pkgconf python3 libevent-dev libboost-dev libzmq3-dev
-          git clone --depth 1 --branch 2025_threadpool_http_server-13march2025 https://github.com/furszy/bitcoin-core
+          sudo apt-get install -y build-essential cmake pkgconf python3 libevent-dev libboost-dev libzmq3-dev libcapnp-dev capnproto
+          git clone --depth 1 --branch 2025_threadpool_http_server https://github.com/furszy/bitcoin-core
           cd bitcoin
           cmake -B build -DENABLE_WALLET=OFF -DWITH_ZMQ=ON -DBUILD_GUI=OFF -DBUILD_BENCH=OFF -DBUILD_FUZZ_BINARY=OFF -DBUILD_GUI_TESTS=OFF -DBUILD_TESTS=OFF -DBUILD_UTIL=OFF -DBUILD_TX=OFF -DBUILD_WALLET_TOOL=OFF
           cmake --build build

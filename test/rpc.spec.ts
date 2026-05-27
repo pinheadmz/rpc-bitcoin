@@ -157,6 +157,14 @@ suite("RPCClient", () => {
         strippedsize: 222,
         size: 258,
         weight: 924,
+        coinbase_tx: {
+          coinbase: "0142062f4077697a2f",
+          locktime: 0,
+          sequence: 4294967295,
+          version: 1,
+          witness:
+            "0000000000000000000000000000000000000000000000000000000000000000",
+        },
         tx: [
           {
             txid: "bd1c71d5604df4b0de01d20d63597883a593116ad4ffb7fb562787e1aa6f20e8",

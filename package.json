@@ -20,8 +20,7 @@
     "test": "mocha -r ts-node/register --full-trace --ui tdd --bail --extension ts",
     "prepublishOnly": "npm run prettier && npm run lint && npm run build && npm run prettier:build && npm run lint:build",
     "postpublish": "rm -fr build",
-    "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "snyk-protect": "snyk protect"
   },
   "repository": {
     "type": "git",

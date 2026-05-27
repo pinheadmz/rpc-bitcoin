@@ -1,0 +1,59 @@
+name: integration
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - pr35182-*
+  pull_request:
+
+jobs:
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build node package
+        run: npm install && npm run build
+
+      - name: Pull bitcoind from custom Docker image
+        run: |
+          IMAGE=pinheadmz/bitcoin:pr35182-ddefe4263b
+          docker pull $IMAGE
+          CID=$(docker create $IMAGE)
+          sudo docker cp $CID:/opt/bin/bitcoind     /usr/local/bin/bitcoind
+          sudo docker cp $CID:/opt/bin/bitcoin-cli  /usr/local/bin/bitcoin-cli
+          # bitcoin-cli links capnp 1.1.0 (PR #35182 IPC); not in Ubuntu repos.
+          # Copy the libs from the image and register them with the loader.
+          sudo mkdir -p /opt/bitcoin-pr35182-lib
+          sudo docker cp $CID:/usr/lib/x86_64-linux-gnu/libcapnp-1.1.0.so     /opt/bitcoin-pr35182-lib/
+          sudo docker cp $CID:/usr/lib/x86_64-linux-gnu/libcapnp-rpc-1.1.0.so /opt/bitcoin-pr35182-lib/
+          echo /opt/bitcoin-pr35182-lib | sudo tee /etc/ld.so.conf.d/bitcoin-pr35182.conf
+          sudo ldconfig
+          docker rm $CID
+          # bitcoind is dynamically linked, libevent is still needed.
+          sudo apt-get update -y
+          sudo apt-get install -y libevent-dev libsqlite3-0
+          bitcoind -version
+          bitcoin-cli -version
+
+      - name: Run bitcoind on testnet4
+        run: |
+          bitcoind -testnet4 -rest=1 -txindex=1 -debug=rpc -debug=http \
+                   -rpcuser=u -rpcpassword=p -blockfilterindex=1 -daemon
+          bitcoin-cli -testnet4 -rpcuser=u -rpcpassword=p -rpcwait \
+                      waitforblockheight 100 100000
+          # Pin to a known reorg height for stable test fixtures.
+          bitcoin-cli -testnet4 -rpcuser=u -rpcpassword=p \
+                      invalidateblock 00000000aa39493ac9c0e2836438a68daf699946b31fee944d97e6191e4ee6bb
+
+      - name: Test
+        run: npm run test

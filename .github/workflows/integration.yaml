@@ -34,8 +34,9 @@ jobs:
           # bitcoin-cli links capnp 1.1.0 (PR #35182 IPC); not in Ubuntu repos.
           # Copy the libs from the image and register them with the loader.
           sudo mkdir -p /opt/bitcoin-pr35182-lib
-          sudo docker cp $CID:/usr/lib/x86_64-linux-gnu/libcapnp-1.1.0.so     /opt/bitcoin-pr35182-lib/
-          sudo docker cp $CID:/usr/lib/x86_64-linux-gnu/libcapnp-rpc-1.1.0.so /opt/bitcoin-pr35182-lib/
+          for lib in libcapnp-1.1.0.so libcapnp-rpc-1.1.0.so libkj-1.1.0.so libkj-async-1.1.0.so; do
+            sudo docker cp $CID:/usr/lib/x86_64-linux-gnu/$lib /opt/bitcoin-pr35182-lib/
+          done
           echo /opt/bitcoin-pr35182-lib | sudo tee /etc/ld.so.conf.d/bitcoin-pr35182.conf
           sudo ldconfig
           docker rm $CID

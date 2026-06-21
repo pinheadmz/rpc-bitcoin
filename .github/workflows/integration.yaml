@@ -25,7 +25,7 @@ jobs:
 
       - name: Pull bitcoind from custom Docker image
         run: |
-          IMAGE=pinheadmz/bitcoin:pr35182-ddefe4263b
+          IMAGE=pinheadmz/bitcoin:pr35182-bb0e968
           docker pull $IMAGE
           CID=$(docker create $IMAGE)
           sudo docker cp $CID:/opt/bin/bitcoind     /usr/local/bin/bitcoind

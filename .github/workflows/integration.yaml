@@ -21,11 +21,11 @@ jobs:
           node-version: 13
 
       - name: Build node package
-        run: npm install && npm run build
+        run: npm install --ignore-scripts && npm run build
 
       - name: Pull bitcoind from custom Docker image
         run: |
-          IMAGE=pinheadmz/bitcoin:pr35182-bb0e968
+          IMAGE=pinheadmz/bitcoin:pr35182
           docker pull $IMAGE
           CID=$(docker create $IMAGE)
           sudo docker cp $CID:/opt/bin/bitcoind     /usr/local/bin/bitcoind
